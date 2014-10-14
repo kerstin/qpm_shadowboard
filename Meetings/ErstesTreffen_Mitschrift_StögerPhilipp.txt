@@ -1,0 +1,29 @@
+Maximal Größe -> Koffer ?
+Standardplatte: 2m * 1m
+
+
+Höhe von Ausschnitten auch feststellen ? Wie? Oder nur lxb
+
+Wann der Auftraggeber "Mark" vorraussichtlich Zeit? (Wochentage -> Nachmittag / Vormittag)
+~eh immer -> Vormittag bevorzugt @ FH
+
+-> 3-4 Treffen mit Betreuer -> alle 2 Wochen
+aber per Mail jede Woche - Status
+
+Gefordert von Betreuer:
+"Was wollen wir umsetzen an Features"
++ groben Projektplan -> in Milestones
+
+Werkzeuge übereinander?
+-> Nein aber Griffleiste -> mit denen man alle Werkzeuge gleichzeitig drauflegen
+
++Logo in das Shadowboard reinlegen -> was reingebrennt werden und gedruckt werden kann.
+
+-> In Vektor dateien
+Anordnung wird von User selbst festgestellt
+
+GUI im Web
+
+Zeitaufzeichnung...
+
+Benutzerhandbuch des Programms für Kunden
