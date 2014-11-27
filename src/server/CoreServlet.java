@@ -24,17 +24,17 @@ import marvin.util.MarvinPluginLoader;
 public class CoreServlet extends HttpServlet 
 {
 	private static final long serialVersionUID = 1L;
-	private MarvinImage		image, backupImage;
-	private MarvinImagePlugin     imagePlugin;
+	private ServletContext mCntx;
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		
+		mCntx = getServletContext();
 //		PrintWriter out = response.getWriter();
 //		Vectorizer myVectorizer = new Vectorizer();
 //		out.println(myVectorizer.getmString());
-		PrintPicture(response, request.getParameter("Pfad"));
+		String pathEditedPicture = CreateEdgePicture(BuildRealPath(request.getParameter("Pfad")));
+		PrintPicture(response, pathEditedPicture);
 		
 	}
 	
@@ -42,38 +42,37 @@ public class CoreServlet extends HttpServlet
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
+		mCntx = getServletContext();
 		PrintWriter out = response.getWriter();
 		out.println("Hello World");
 	}
 	
-	public void PrintPicture(HttpServletResponse resp, String path) throws IOException 
-	{
-		ServletContext cntx= getServletContext();
-		// Get the absolute path of the image
-		String filename = cntx.getRealPath("Images/button_.png");
-		if((path != "") || (path != null))
-			filename = cntx.getRealPath("Images/" + path);
+	public String BuildRealPath(String filename)
+	{	
+		String RealPath;	
 		
-		File file = new File(filename);
-		if(!file.exists())
-		{
-			PrintWriter out = resp.getWriter();
-			//Vectorizer myVectorizer = new Vectorizer();
-			out.println("Datei nicht gefunden");
-			out.println("realPath: " + filename);
-			return;
-		}
+		if((filename != "") || (filename != null))
+			RealPath = mCntx.getRealPath("Images/" + filename);
+		else
+			RealPath = mCntx.getRealPath("Images/button_.png");
+		
+		return RealPath;		
+	}
+	
+	public String CreateEdgePicture(String path)	//returns the path of the edited picture
+	{
+		MarvinImage	image;
+		MarvinImagePlugin imagePlugin;
 		
 		MarvinDefinitions.setImagePluginPath("D:/Dropbox/FH/ITP3/Shadowboard/marvin/plugins/image/");
-		image = MarvinImageIO.loadImage(filename);
-		backupImage = image.clone();        
+		image = MarvinImageIO.loadImage(path);      
 		imagePlugin = MarvinPluginLoader.loadImagePlugin("org.marvinproject.image.edge.edgeDetector.jar");
 		imagePlugin.process(image, image);
 		imagePlugin = MarvinPluginLoader.loadImagePlugin("org.marvinproject.image.color.invert.jar");
 		imagePlugin.process(image, image);
         image.update();
         
-        String newFilename = filename;
+        String newFilename = path;
         int Index = newFilename.lastIndexOf('.');
         String nameOfFile = newFilename.substring(0, Index);
         String endingOfFile = newFilename.substring(Index, newFilename.length());
@@ -81,20 +80,34 @@ public class CoreServlet extends HttpServlet
         
         MarvinImageIO.saveImage(image, newFilename);
         System.out.println("Saved file as: " + newFilename);
-		
+        
+        return newFilename;
+	}
+	
+	public void PrintPicture(HttpServletResponse resp, String path) throws IOException 
+	{		
+		File file = new File(path);
+		if(!file.exists())
+		{
+			PrintWriter out = resp.getWriter();
+			//Vectorizer myVectorizer = new Vectorizer();
+			out.println("Datei nicht gefunden");
+			out.println("realPath: " + path);
+			return;
+		}
+				
 		// retrieve mimeType dynamically
-		String mime = cntx.getMimeType(newFilename);
+		String mime = mCntx.getMimeType(path);
 		if (mime == null) 
 		{
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
 	
-		File NewFile = new File(newFilename);
 		resp.setContentType(mime);
-		resp.setContentLength((int)NewFile.length());
+		resp.setContentLength((int)file.length());
 	
-		FileInputStream in = new FileInputStream(NewFile);
+		FileInputStream in = new FileInputStream(file);
 		OutputStream out = resp.getOutputStream();
 	
 		// Copy the contents of the file to the output stream
