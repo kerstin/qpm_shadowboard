@@ -10,5 +10,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="D:/Dropbox/FH/ITP3/Shadowboard/marvin/framework/marvin_1.5.1.jar"/>
+	<classpathentry kind="lib" path="D:/Dropbox/FH/ITP3/Shadowboard/batik-1.7/batik.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

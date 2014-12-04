@@ -1,23 +1,39 @@
 package server;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.ImageIcon;
 
 import marvin.MarvinDefinitions;
 import marvin.image.MarvinImage;
 import marvin.io.MarvinImageIO;
 import marvin.plugin.MarvinImagePlugin;
 import marvin.util.MarvinPluginLoader;
+
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 
 @WebServlet("/app")
@@ -36,6 +52,9 @@ public class CoreServlet extends HttpServlet
 		String pathEditedPicture = CreateEdgePicture(BuildRealPath(request.getParameter("Pfad")));
 		PrintPicture(response, pathEditedPicture);
 		
+		System.out.println("Starting with batik");
+		TestBatik();
+		
 	}
 	
 
@@ -45,6 +64,73 @@ public class CoreServlet extends HttpServlet
 		mCntx = getServletContext();
 		PrintWriter out = response.getWriter();
 		out.println("Hello World");
+	}
+	
+	public void InsertPictureIntoSVG(Graphics2D g2d) 
+	{
+		//g2d.setPaint(Color.red);
+		//g2d.fill(new Rectangle(10, 10, 100, 100));
+		
+		System.out.println("appending realpath1");
+		String RealPath;
+		//RealPath = BuildRealPath("tooltest.edited.jpg");	
+		System.out.println("Loading edited image");
+		RealPath = "C:/test.jpg";
+		File file = new File(RealPath);
+		
+		if(file.exists())
+			System.out.println("file gibts.");
+		else
+			System.out.println("file gibts ned");
+				
+		Image img;
+		try
+		{
+			img = ImageIO.read(new File(RealPath));
+			g2d.drawImage(img, 0, 0, null);
+		} 
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("drwan image to g2d");
+	}
+
+	public void TestBatik() throws IOException 
+	{
+
+		// Get a DOMImplementation.
+		DOMImplementation domImpl =
+		GenericDOMImplementation.getDOMImplementation();
+	
+		// Create an instance of org.w3c.dom.Document.
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+	
+		// Create an instance of the SVG Generator.
+		SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+	
+		// Ask the test to render into the SVG Graphics2D implementation.
+		CoreServlet test = new CoreServlet();
+		test.InsertPictureIntoSVG(svgGenerator);
+	
+		// Finally, stream out SVG to the standard output using
+		// UTF-8 encoding.
+		boolean useCSS = true; // we want to use CSS style attributes
+		
+		String TempRealPath = BuildRealPath("Temp.svg");
+		File yourFile = new File(TempRealPath);
+		if(!yourFile.exists()) 
+		{
+		    yourFile.createNewFile();
+		} 
+		FileOutputStream oFile = new FileOutputStream(yourFile, false); 
+		
+		Writer out = new OutputStreamWriter(oFile, "UTF-8");
+		
+		svgGenerator.stream(out, useCSS);
 	}
 	
 	public String BuildRealPath(String filename)

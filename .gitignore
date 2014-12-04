@@ -1,2 +1,4 @@
 build/
 *.classpath
+batik-1.7/samples
+batik-1.7/docs
